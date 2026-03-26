@@ -5,26 +5,39 @@ const cors = require("cors");
 
 const app = express();
 
-// Allow frontend (Vite React)
+
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://type-arena-puce.vercel.app"
+];
+
 app.use(cors({
-  origin: "http://localhost:5173",
-  methods: ["GET", "POST"]
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST"],
+  credentials: true
 }));
 
 const server = http.createServer(app);
 
-// Socket.IO setup
+
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
 
-// ----------------------
-// WORD LIST
-// ----------------------
+
 
 const wordList = [
   "time","people","world","life","day",
@@ -35,51 +48,35 @@ const wordList = [
 ];
 
 
-// ----------------------
-// GENERATE TEXT
-// ----------------------
+
 
 function generateText(wordCount = 150) {
-
   let result = [];
 
   for (let i = 0; i < wordCount; i++) {
-
     const randomIndex = Math.floor(Math.random() * wordList.length);
-
     result.push(wordList[randomIndex]);
-
   }
 
   return result.join(" ");
 }
 
 
-// ----------------------
-// ROOM STORAGE
-// ----------------------
+
 
 const rooms = {};
 
 
-// ----------------------
-// SOCKET CONNECTION
-// ----------------------
+
 
 io.on("connection", (socket) => {
 
   console.log("User connected:", socket.id);
 
 
-  // ----------------------
-  // CREATE ROOM
-  // ----------------------
-
   socket.on("create-room", () => {
 
     const roomId = Math.random().toString(36).substring(2, 8);
-
-    console.log("Room created:", roomId);
 
     rooms[roomId] = {
       host: socket.id,
@@ -91,6 +88,8 @@ io.on("connection", (socket) => {
 
     socket.join(roomId);
 
+    console.log("Room created:", roomId);
+
     socket.emit("room-created", roomId);
 
     io.to(roomId).emit("room-update", rooms[roomId]);
@@ -98,9 +97,7 @@ io.on("connection", (socket) => {
   });
 
 
-  // ----------------------
-  // JOIN ROOM
-  // ----------------------
+ 
 
   socket.on("join-room", (roomId) => {
 
@@ -115,16 +112,13 @@ io.on("connection", (socket) => {
   });
 
 
-  // ----------------------
-  // READY
-  // ----------------------
+
 
   socket.on("ready", ({ roomId, role }) => {
 
     if (!rooms[roomId]) return;
 
     if (role === "host") rooms[roomId].hostReady = true;
-
     if (role === "guest") rooms[roomId].guestReady = true;
 
     io.to(roomId).emit("room-update", rooms[roomId]);
@@ -132,9 +126,7 @@ io.on("connection", (socket) => {
   });
 
 
-  // ----------------------
-  // START BATTLE
-  // ----------------------
+ 
 
   socket.on("start", (roomId) => {
 
@@ -149,9 +141,7 @@ io.on("connection", (socket) => {
   });
 
 
-  // ----------------------
-  // TYPING PROGRESS
-  // ----------------------
+  
 
   socket.on("progress", ({ roomId, progress }) => {
 
@@ -162,40 +152,30 @@ io.on("connection", (socket) => {
   });
 
 
-  // ----------------------
-  // FINISH EVENT
-  // ----------------------
+
 
   socket.on("finish", ({ roomId, wpm }) => {
 
     if (!rooms[roomId]) return;
 
-    socket.to(roomId).emit("opponent-finished", {
-      wpm
-    });
+    socket.to(roomId).emit("opponent-finished", { wpm });
 
   });
 
 
-  // ----------------------
-  // DISCONNECT
-  // ----------------------
+
 
   socket.on("disconnect", () => {
-
     console.log("User disconnected:", socket.id);
-
   });
 
 });
 
 
-// ----------------------
-// START SERVER
-// ----------------------
 
-server.listen(5000, () => {
 
-  console.log("Server running on port 5000");
+const PORT = process.env.PORT || 5000;
 
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
