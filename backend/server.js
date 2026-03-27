@@ -5,6 +5,9 @@ const cors = require("cors");
 
 const app = express();
 
+// ----------------------
+// CORS
+// ----------------------
 const allowedOrigins = [
   "http://localhost:5173",
   "https://type-arena-puce.vercel.app"
@@ -12,13 +15,20 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: allowedOrigins,
-  methods: ["GET", "POST"],
   credentials: true
 }));
 
+// ----------------------
+// HTTP SERVER
+// ----------------------
 const server = http.createServer(app);
 
+// ----------------------
+// SOCKET.IO (🔥 FIX HERE)
+// ----------------------
 const io = new Server(server, {
+  path: "/socket.io/",            // ✅ IMPORTANT
+  transports: ["websocket"],      // ✅ FORCE WEBSOCKET
   cors: {
     origin: allowedOrigins,
     methods: ["GET", "POST"],
@@ -26,12 +36,20 @@ const io = new Server(server, {
   }
 });
 
+// ----------------------
+// ROOMS
+// ----------------------
 const rooms = {};
 
+// ----------------------
+// SOCKET CONNECTION
+// ----------------------
 io.on("connection", (socket) => {
+
   console.log("Connected:", socket.id);
 
   socket.on("create-room", () => {
+
     const roomId = Math.random().toString(36).substring(2, 8);
 
     rooms[roomId] = {
@@ -43,8 +61,12 @@ io.on("connection", (socket) => {
 
     socket.emit("room-created", roomId);
   });
+
 });
 
+// ----------------------
+// PORT (RAILWAY)
+// ----------------------
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
