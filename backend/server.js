@@ -6,25 +6,10 @@ const cors = require("cors");
 const app = express();
 
 // ----------------------
-// ✅ ALLOWED ORIGINS
-// ----------------------
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://type-arena-puce.vercel.app"
-];
-
-// ----------------------
-// ✅ CORS FIX (VERY IMPORTANT)
+// ✅ VERY SAFE CORS (works everywhere)
 // ----------------------
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS not allowed: " + origin));
-    }
-  },
-  credentials: true
+  origin: "*", // 🔥 allow all (for now)
 }));
 
 // ----------------------
@@ -40,13 +25,11 @@ app.get("/", (req, res) => {
 const server = http.createServer(app);
 
 // ----------------------
-// SOCKET.IO (CORS FIXED)
+// SOCKET.IO
 // ----------------------
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    credentials: true
+    origin: "*", // 🔥 allow all (fixes your issue)
   }
 });
 
@@ -59,7 +42,7 @@ const rooms = {};
 // SOCKET LOGIC
 // ----------------------
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log("✅ User connected:", socket.id);
 
   socket.on("create-room", () => {
     const roomId = Math.random().toString(36).substring(2, 8);
@@ -105,7 +88,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Disconnected:", socket.id);
+    console.log("❌ Disconnected:", socket.id);
   });
 });
 
@@ -114,6 +97,6 @@ io.on("connection", (socket) => {
 // ----------------------
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log("🔥 Server running on port", PORT);
 });
