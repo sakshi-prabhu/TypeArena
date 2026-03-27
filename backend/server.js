@@ -5,8 +5,17 @@ const cors = require("cors");
 
 const app = express();
 
+// 🔥 GLOBAL ERROR HANDLER (IMPORTANT)
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled Rejection:", err);
+});
+
 // ----------------------
-// ✅ CORS (ALLOW ALL - SAFE FOR NOW)
+// CORS
 // ----------------------
 app.use(cors({
   origin: true,
@@ -14,14 +23,14 @@ app.use(cors({
 }));
 
 // ----------------------
-// ✅ HEALTH ROUTE (REQUIRED FOR RAILWAY)
+// HEALTH ROUTE
 // ----------------------
 app.get("/", (req, res) => {
   res.send("Server is running 🚀");
 });
 
 // ----------------------
-// HTTP SERVER
+// SERVER
 // ----------------------
 const server = http.createServer(app);
 
@@ -42,100 +51,67 @@ const io = new Server(server, {
 const rooms = {};
 
 // ----------------------
-// GENERATE TEXT
-// ----------------------
-function generateText(wordCount = 100) {
-  const wordList = [
-    "time","people","world","life","day",
-    "practice","typing","speed","focus","skill",
-    "give","fun","which","what","know",
-    "learn","improve","keyboard","accuracy","game",
-    "the","her","because"
-  ];
-
-  let result = [];
-
-  for (let i = 0; i < wordCount; i++) {
-    const randomIndex = Math.floor(Math.random() * wordList.length);
-    result.push(wordList[randomIndex]);
-  }
-
-  return result.join(" ");
-}
-
-// ----------------------
-// SOCKET EVENTS
+// SAFE SOCKET HANDLER
 // ----------------------
 io.on("connection", (socket) => {
-
   console.log("User connected:", socket.id);
 
-  // CREATE ROOM
-  socket.on("create-room", () => {
-    const roomId = Math.random().toString(36).substring(2, 8);
+  try {
 
-    rooms[roomId] = {
-      host: socket.id,
-      guest: null,
-      hostReady: false,
-      guestReady: false,
-      text: ""
-    };
+    socket.on("create-room", () => {
+      const roomId = Math.random().toString(36).substring(2, 8);
 
-    socket.join(roomId);
+      rooms[roomId] = {
+        host: socket.id,
+        guest: null,
+        hostReady: false,
+        guestReady: false,
+        text: ""
+      };
 
-    socket.emit("room-created", roomId);
-    io.to(roomId).emit("room-update", rooms[roomId]);
-  });
+      socket.join(roomId);
+      socket.emit("room-created", roomId);
+      io.to(roomId).emit("room-update", rooms[roomId]);
+    });
 
-  // JOIN ROOM
-  socket.on("join-room", (roomId) => {
-    if (!rooms[roomId]) return;
+    socket.on("join-room", (roomId) => {
+      if (!rooms[roomId]) return;
 
-    rooms[roomId].guest = socket.id;
-    socket.join(roomId);
+      rooms[roomId].guest = socket.id;
+      socket.join(roomId);
 
-    io.to(roomId).emit("room-update", rooms[roomId]);
-  });
+      io.to(roomId).emit("room-update", rooms[roomId]);
+    });
 
-  // READY
-  socket.on("ready", ({ roomId, role }) => {
-    if (!rooms[roomId]) return;
+    socket.on("ready", ({ roomId, role }) => {
+      if (!rooms[roomId]) return;
 
-    if (role === "host") rooms[roomId].hostReady = true;
-    if (role === "guest") rooms[roomId].guestReady = true;
+      if (role === "host") rooms[roomId].hostReady = true;
+      if (role === "guest") rooms[roomId].guestReady = true;
 
-    io.to(roomId).emit("room-update", rooms[roomId]);
-  });
+      io.to(roomId).emit("room-update", rooms[roomId]);
+    });
 
-  // START GAME
-  socket.on("start", (roomId) => {
-    if (!rooms[roomId]) return;
+    socket.on("start", (roomId) => {
+      if (!rooms[roomId]) return;
 
-    const text = generateText(100);
-    rooms[roomId].text = text;
+      const text = "typing game test text";
+      rooms[roomId].text = text;
 
-    io.to(roomId).emit("battle-start", text);
-  });
+      io.to(roomId).emit("battle-start", text);
+    });
 
-  // PROGRESS
-  socket.on("progress", ({ roomId, progress }) => {
-    socket.to(roomId).emit("opponent-progress", progress);
-  });
-
-  // FINISH
-  socket.on("finish", ({ roomId, wpm }) => {
-    socket.to(roomId).emit("opponent-finished", { wpm });
-  });
+  } catch (err) {
+    console.error("Socket Error:", err);
+  }
 
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+    console.log("Disconnected:", socket.id);
   });
-
 });
 
 // ----------------------
-// 🔥 PORT + BINDING (CRITICAL FIX)
+// PORT (🔥 IMPORTANT)
 // ----------------------
 const PORT = process.env.PORT || 5000;
 
