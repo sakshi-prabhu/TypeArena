@@ -6,63 +6,41 @@ const cors = require("cors");
 const app = express();
 
 // ----------------------
-// GLOBAL ERROR HANDLER
-// ----------------------
-process.on("uncaughtException", (err) => {
-  console.error("Uncaught Exception:", err);
-});
-
-process.on("unhandledRejection", (err) => {
-  console.error("Unhandled Rejection:", err);
-});
-
-// ----------------------
-// CORS (🔥 FIXED)
+// CORS (FIXED)
 // ----------------------
 app.use(cors({
   origin: [
-    "http://localhost:5173", // local
-    "https://your-frontend.vercel.app" // 🔥 CHANGE THIS
+    "http://localhost:5173",
+    "https://type-arena-puce.vercel.app"
   ],
   credentials: true
 }));
 
-// ----------------------
-// ROUTE
 // ----------------------
 app.get("/", (req, res) => {
   res.send("Server is running 🚀");
 });
 
 // ----------------------
-// SERVER
-// ----------------------
 const server = http.createServer(app);
 
 // ----------------------
-// SOCKET.IO (🔥 FIXED)
+// SOCKET.IO (FIXED)
 // ----------------------
 const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:5173",
       "https://type-arena-puce.vercel.app"
-
     ],
     methods: ["GET", "POST"],
     credentials: true
-  },
-  transports: ["websocket"] // 🔥 IMPORTANT
+  }
 });
 
 // ----------------------
-// ROOMS
-// ----------------------
 const rooms = {};
 
-// ----------------------
-// SOCKET HANDLING
-// ----------------------
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
@@ -114,8 +92,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// ----------------------
-// PORT (🔥 REQUIRED)
 // ----------------------
 const PORT = process.env.PORT || 5000;
 
