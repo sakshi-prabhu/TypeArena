@@ -6,7 +6,7 @@ const cors = require("cors");
 const app = express();
 
 // ----------------------
-// 🔥 CORS (FINAL)
+// ✅ CORS (ALLOW ALL - SAFE FOR NOW)
 // ----------------------
 app.use(cors({
   origin: true,
@@ -14,7 +14,7 @@ app.use(cors({
 }));
 
 // ----------------------
-// ✅ HEALTH ROUTE (VERY IMPORTANT)
+// ✅ HEALTH ROUTE (REQUIRED FOR RAILWAY)
 // ----------------------
 app.get("/", (req, res) => {
   res.send("Server is running 🚀");
@@ -135,10 +135,10 @@ io.on("connection", (socket) => {
 });
 
 // ----------------------
-// PORT (RAILWAY)
+// 🔥 PORT + BINDING (CRITICAL FIX)
 // ----------------------
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
