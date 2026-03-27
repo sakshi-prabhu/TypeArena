@@ -6,12 +6,19 @@ const cors = require("cors");
 const app = express();
 
 // ----------------------
-// 🔥 CORS (FINAL FIX)
+// 🔥 CORS (FINAL)
 // ----------------------
 app.use(cors({
-  origin: true,        // ✅ allow all origins (important for Railway)
+  origin: true,
   credentials: true
 }));
+
+// ----------------------
+// ✅ HEALTH ROUTE (VERY IMPORTANT)
+// ----------------------
+app.get("/", (req, res) => {
+  res.send("Server is running 🚀");
+});
 
 // ----------------------
 // HTTP SERVER
@@ -23,14 +30,14 @@ const server = http.createServer(app);
 // ----------------------
 const io = new Server(server, {
   cors: {
-    origin: true,      // ✅ allow all origins
+    origin: true,
     methods: ["GET", "POST"],
     credentials: true
   }
 });
 
 // ----------------------
-// ROOMS STORAGE
+// ROOMS
 // ----------------------
 const rooms = {};
 
@@ -125,13 +132,6 @@ io.on("connection", (socket) => {
     console.log("User disconnected:", socket.id);
   });
 
-});
-
-// ----------------------
-// ROOT ROUTE (IMPORTANT)
-// ----------------------
-app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
 });
 
 // ----------------------
