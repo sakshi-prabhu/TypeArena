@@ -11,7 +11,8 @@ const wordList = [
   "the","her","because",
 ];
 
-function generateText(wordCount = 80) {
+// 🔥 UPDATED: 120 words
+function generateText(wordCount = 120) {
   let result = [];
   for (let i = 0; i < wordCount; i++) {
     const index = Math.floor(Math.random() * wordList.length);
@@ -73,7 +74,7 @@ function Battle() {
   }, []);
 
   // ----------------------
-  // SOCKET EVENTS (🔥 FIXED)
+  // SOCKET EVENTS
   // ----------------------
   useEffect(() => {
 
@@ -91,7 +92,9 @@ function Battle() {
     });
 
     socket.on("battle-start", (serverText) => {
-      const battleText = serverText || generateText();
+      // 🔥 ALWAYS use server text (important)
+      const battleText = serverText || generateText(120);
+
       hasCountedBattleRef.current = false;
       setBattleStarted(true);
       startCountdown(battleText);
@@ -120,7 +123,7 @@ function Battle() {
       socket.off("opponent-finished");
     };
 
-  }, []); // ✅ IMPORTANT FIX
+  }, []);
 
   // ----------------------
   // TIMER
