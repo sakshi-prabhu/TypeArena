@@ -23,11 +23,53 @@ const io = new Server(server, {
   }
 });
 
+// ----------------------
+// 🔥 WORD POOL (BIG LIST)
+// ----------------------
+const wordPool = [
+  "time","people","world","life","day","night","year","work","system","data",
+  "code","logic","array","string","function","variable","object","value",
+  "input","output","event","render","update","component","state","hook",
+  "react","node","express","socket","server","client","network","latency",
+  "speed","typing","keyboard","practice","focus","accuracy","skill",
+  "improve","learn","challenge","battle","competition","player","winner",
+  "random","generate","text","words","display","screen","monitor","task",
+  "goal","result","performance","fast","slow","efficient","optimize",
+  "debug","error","fix","build","project","design","frontend","backend",
+  "database","query","index","memory","cache","process","thread","loop",
+  "condition","true","false","start","end","progress","level","score",
+  "rank","match","game","play","round","timer","clock","second","minute"
+];
+
+// ----------------------
+// 🔥 TEXT GENERATOR (120 WORDS)
+// ----------------------
+function generateText(wordCount = 120) {
+  let result = [];
+
+  for (let i = 0; i < wordCount; i++) {
+    let word;
+
+    // ❌ avoid consecutive repeat
+    do {
+      word = wordPool[Math.floor(Math.random() * wordPool.length)];
+    } while (result[result.length - 1] === word);
+
+    result.push(word);
+  }
+
+  return result.join(" ");
+}
+
+// ----------------------
+// ROOMS
+// ----------------------
 const rooms = {};
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
+  // CREATE ROOM
   socket.on("create-room", () => {
     const roomId = Math.random().toString(36).substring(2, 8);
 
@@ -44,6 +86,7 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("room-update", rooms[roomId]);
   });
 
+  // JOIN ROOM
   socket.on("join-room", (roomId) => {
     if (!rooms[roomId]) return;
 
@@ -53,6 +96,7 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("room-update", rooms[roomId]);
   });
 
+  // READY
   socket.on("ready", ({ roomId, role }) => {
     if (!rooms[roomId]) return;
 
@@ -62,21 +106,35 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("room-update", rooms[roomId]);
   });
 
+  // 🔥 START BATTLE (FIXED)
   socket.on("start", (roomId) => {
     if (!rooms[roomId]) return;
 
-    const text = "typing game test text";
+    const text = generateText(120); // ✅ BIG TEXT
     rooms[roomId].text = text;
 
     io.to(roomId).emit("battle-start", text);
   });
 
+  // PROGRESS
+  socket.on("progress", ({ roomId, progress }) => {
+    socket.to(roomId).emit("opponent-progress", progress);
+  });
+
+  // FINISH
+  socket.on("finish", ({ roomId, wpm }) => {
+    socket.to(roomId).emit("opponent-finished", wpm);
+  });
+
+  // DISCONNECT
   socket.on("disconnect", () => {
     console.log("Disconnected:", socket.id);
   });
 });
 
-// ✅ IMPORTANT (Render compatible)
+// ----------------------
+// SERVER START
+// ----------------------
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {

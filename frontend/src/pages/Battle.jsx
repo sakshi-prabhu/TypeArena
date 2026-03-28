@@ -3,26 +3,7 @@ import { useParams } from "react-router-dom";
 import "../styles/battle.css";
 import { socket } from "../socket/socket";
 
-const wordList = [
-  "time","people","world","life","day",
-  "practice","typing","speed","focus","skill",
-  "give","fun","which","what","know",
-  "learn","improve","keyboard","accuracy","game",
-  "the","her","because",
-];
-
-// 🔥 UPDATED: 120 words
-function generateText(wordCount = 120) {
-  let result = [];
-  for (let i = 0; i < wordCount; i++) {
-    const index = Math.floor(Math.random() * wordList.length);
-    result.push(wordList[index]);
-  }
-  return result.join(" ");
-}
-
 function Battle() {
-
   const hasCountedBattleRef = useRef(false);
 
   const [roomId, setRoomId] = useState("");
@@ -77,7 +58,6 @@ function Battle() {
   // SOCKET EVENTS
   // ----------------------
   useEffect(() => {
-
     socket.on("connect", () => {
       console.log("Connected:", socket.id);
     });
@@ -92,8 +72,8 @@ function Battle() {
     });
 
     socket.on("battle-start", (serverText) => {
-      // 🔥 ALWAYS use server text (important)
-      const battleText = serverText || generateText(120);
+      // ✅ ONLY use server text
+      const battleText = serverText;
 
       hasCountedBattleRef.current = false;
       setBattleStarted(true);
@@ -106,6 +86,7 @@ function Battle() {
 
     socket.on("opponent-finished", () => {
       setWinner("Opponent");
+      setTimerRunning(false);
     });
 
     if (urlRoomId) {
@@ -122,7 +103,6 @@ function Battle() {
       socket.off("opponent-progress");
       socket.off("opponent-finished");
     };
-
   }, []);
 
   // ----------------------
@@ -299,7 +279,7 @@ function Battle() {
 
           <h2>Time Left: {timeLeft}s</h2>
 
-          {countdown && <div>{countdown}</div>}
+          {countdown && <div className="countdown">{countdown}</div>}
 
           <div id="text-display"></div>
 
@@ -307,6 +287,7 @@ function Battle() {
             value={input}
             onChange={handleTyping}
             placeholder="Start typing..."
+            autoFocus
           />
 
           <h3>WPM: {wpm}</h3>
