@@ -22,7 +22,10 @@ function Battle() {
 
   const [startTime, setStartTime] = useState(null);
   const [wpm, setWpm] = useState(0);
+  const [accuracy, setAccuracy] = useState(0);
   const [winner, setWinner] = useState(null);
+  const [correctChars, setCorrectChars] = useState(0);
+  const [totalCharsTyped, setTotalCharsTyped] = useState(0);
 
   const [timeLeft, setTimeLeft] = useState(60);
   const [timerRunning, setTimerRunning] = useState(false);
@@ -116,7 +119,9 @@ function Battle() {
         if (prev <= 1) {
           clearInterval(timer);
           setTimerRunning(false);
-          if (!winner) setWinner("Time Up");
+          if (!winner) {
+            setWinner("Time Up");
+          }
           return 0;
         }
         return prev - 1;
@@ -166,6 +171,12 @@ function Battle() {
 
     setSpans(newSpans);
     setCurrentIndex(0);
+    setInput("");
+    setWpm(0);
+    setAccuracy(0);
+    setCorrectChars(0);
+    setTotalCharsTyped(0);
+    setWinner(null);
 
     setStartTime(Date.now());
     setTimeLeft(60);
@@ -190,8 +201,10 @@ function Battle() {
 
     spans[currentIndex].classList.remove("active");
 
+    let isCorrect = false;
     if (typedChar === expectedChar) {
       spans[currentIndex].classList.add("correct");
+      isCorrect = true;
     } else {
       spans[currentIndex].classList.add("wrong");
     }
@@ -203,6 +216,15 @@ function Battle() {
     }
 
     setCurrentIndex(nextIndex);
+
+    // Update accuracy tracking
+    const newCorrectChars = isCorrect ? correctChars + 1 : correctChars;
+    const newTotalCharsTyped = totalCharsTyped + 1;
+    const currentAccuracy = Math.round((newCorrectChars / newTotalCharsTyped) * 100);
+    
+    setCorrectChars(newCorrectChars);
+    setTotalCharsTyped(newTotalCharsTyped);
+    setAccuracy(currentAccuracy);
 
     const progress = Math.floor((nextIndex / spans.length) * 100);
     setMyProgress(progress);
@@ -216,7 +238,7 @@ function Battle() {
     setWpm(currentWpm);
 
     if (nextIndex === spans.length) {
-      socket.emit("finish", { roomId, wpm: currentWpm });
+      socket.emit("finish", { roomId, wpm: currentWpm, accuracy: currentAccuracy });
       setWinner("You");
       setTimerRunning(false);
     }
@@ -288,11 +310,23 @@ function Battle() {
             onChange={handleTyping}
             placeholder="Start typing..."
             autoFocus
+            disabled={!!winner}
           />
 
-          <h3>WPM: {wpm}</h3>
+          {!winner && <h3>WPM: {wpm}</h3>}
 
-          {winner && <h2>{winner}</h2>}
+          {winner && (
+            <div className="result">
+              <h2>Result</h2>
+
+              <p>Winner: {winner}</p>
+              <p>WPM: {wpm}</p>
+              <p>Accuracy: {accuracy}%</p>
+              <p>Mistakes: {totalCharsTyped - correctChars}</p>
+
+              <button onClick={() => window.location.reload()}>Play Again</button>
+            </div>
+          )}
 
         </div>
       )}

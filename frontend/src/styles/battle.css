@@ -216,3 +216,39 @@ button:disabled{
   margin-top:20px;
   color:gold;
 }
+
+.result {
+  text-align: center;
+  padding: 40px;
+  margin-left: 450px;
+  margin-top: 80px;
+  border-radius: 20px;
+  background: linear-gradient(#758edf, #386dbd, #0b31b1);
+  width: 900px;
+}
+
+.result h2 {
+  margin-bottom: 20px;
+}
+
+.result p {
+  font-size: 20px;
+  margin: 15px 0;
+}
+
+.result button {
+  margin-top: 20px;
+  padding: 12px 28px;
+  font-size: 18px;
+  border-radius: 12px;
+  border: none;
+  background: #3d7cce;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.result button:hover {
+  background: #2b63af;
+  transform: scale(1.05);
+}
