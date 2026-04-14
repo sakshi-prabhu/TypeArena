@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import "../styles/practice.css";
+import ThemeToggle from "../components/ThemeToggle";
 
 const wordList = [
   "time",
@@ -131,6 +132,7 @@ export default function Practice() {
 
   return (
     <div className="practice-page">
+      <ThemeToggle />
       <h1 className="title">TypeArena Practice Mode</h1>
 
       {!finished && (

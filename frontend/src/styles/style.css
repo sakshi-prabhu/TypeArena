@@ -4,15 +4,17 @@
   min-height: 100vh;
   background: radial-gradient(
     ellipse at 25% 25%,
-    #1a2f6e 0%,
-    #07093a 55%,
-    #020220 100%
+    var(--bg-page-gradient-1) 0%,
+    var(--bg-page-gradient-2) 55%,
+    var(--bg-page-gradient-3) 100%
   );
 
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+
+  transition: background 0.3s;
 }
 
 /* ===== GLASS CARD ===== */
@@ -22,30 +24,30 @@
   padding: 52px 44px;
   border-radius: 22px;
 
-  background: rgba(255, 255, 255, 0.06);
-
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-primary);
 
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  box-shadow: var(--shadow-lg);
 
   text-align: center;
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
 .home-card h1 {
   margin: 0 0 10px;
   font-size: 28px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
   letter-spacing: 0.2px;
 }
 
 .home-card p {
   margin: 0 0 32px;
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.58);
+  color: var(--text-muted);
 }
 
 /* ===== ACTION BUTTONS ===== */
@@ -65,7 +67,7 @@
   border: none;
   border-radius: 10px;
 
-  background: #3a6fd8;
+  background: var(--brand);
   color: #ffffff;
 
   cursor: pointer;
@@ -75,7 +77,7 @@
 
 #practice-btn:hover,
 #battle-btn:hover {
-  background: #2e5cbf;
+  background: var(--brand-hover);
   transform: translateY(-1px);
 }
 
@@ -92,14 +94,14 @@
 
   border-radius: 50%;
 
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border: 1.5px solid var(--border-primary);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: transparent;
-  color: white;
+  background: var(--bg-glass);
+  color: var(--text-primary);
 
   cursor: pointer;
 
@@ -107,11 +109,10 @@
 }
 
 .profile-btn:hover {
-  border-color: rgba(255, 255, 255, 0.6);
-
+  border-color: var(--brand);
+  background: var(--brand-subtle);
   transform: translateY(-2px);
-
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow-md);
 }
 
 .profile-btn .material-symbols-outlined {

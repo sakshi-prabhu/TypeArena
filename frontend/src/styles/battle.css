@@ -1,239 +1,271 @@
-.hidden{
-  display:none;
+.hidden {
+  display: none;
 }
 
-body{
-  background-color: rgb(2 2 60 / 91%);
-  color:white;
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ================= MAIN CONTAINER ================= */
 
-.battle-container{
-  text-align:center;
-  padding:120px 40px 40px;
-  min-height:100vh;
+.battle-container {
+  text-align: center;
+  padding: 120px 40px 40px;
+  min-height: 100vh;
+
+  background: radial-gradient(
+    ellipse at 25% 25%,
+    var(--bg-page-gradient-1) 0%,
+    var(--bg-page-gradient-2) 55%,
+    var(--bg-page-gradient-3) 100%
+  );
+
+  transition: background 0.3s;
 }
 
-.battle-container > h1{
-  position:fixed;
-  top:22px;
-  left:0;
-  right:0;
-  margin:0;
-  padding:14px 0;
-  text-align:center;
-  color:#3d7cce;
-  background:rgb(2 2 60 / 91%);
-  z-index:100;
+.battle-container > h1 {
+  position: fixed;
+  top: 22px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 14px 0;
+  text-align: center;
+  color: var(--brand);
+  background: var(--bg-primary);
+  z-index: 100;
+  transition: background 0.3s, color 0.3s;
 }
 
-.battle-container.lobby-view{
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
+.battle-container.lobby-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 /* ================= LOBBY ================= */
 
-.lobby{
-  width:min(750px, 90vw);
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  margin:0;
-  padding:40px;
-  border-radius:25px;
+.lobby {
+  width: min(750px, 90vw);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 40px;
+  border-radius: 25px;
 
-  background: linear-gradient(145deg,#1b2b5a,#0d1c3d);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-primary);
 
-  box-shadow:0 0 25px rgba(0,0,0,0.6);
+  box-shadow: var(--shadow-lg);
+  transition: background 0.3s, border-color 0.3s;
 }
 
-.battle-container.lobby-view .lobby{
-  margin:0;
+.battle-container.lobby-view .lobby {
+  margin: 0;
 }
 
 /* ================= CARDS ================= */
 
-.card{
-  background:#14295a;
-  padding:25px;
-  border-radius:20px;
-  margin:25px 0;
-  box-shadow:0 0 15px rgba(0,0,0,0.4);
+.card {
+  background: var(--bg-elevated);
+  padding: 25px;
+  border-radius: 20px;
+  margin: 25px 0;
+  border: 1px solid var(--border-secondary);
+  box-shadow: var(--shadow-md);
+  transition: background 0.3s, border-color 0.3s;
 }
 
 /* ================= BUTTONS ================= */
 
-button{
-  padding:12px 25px;
-  font-size:18px;
-  border-radius:12px;
-  border:none;
-  cursor:pointer;
-  margin:10px;
-  transition:all .2s ease;
+button {
+  padding: 12px 25px;
+  font-size: 18px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  margin: 10px;
+  transition: all .2s ease;
 }
 
-button:not(:disabled):hover{
-  transform:scale(1.05);
+button:not(:disabled):hover {
+  transform: scale(1.05);
 }
 
-button:disabled{
-  background:#555;
-  color:white;
+button:disabled {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
 }
 
-.copy-btn{
-  background:#2f77d1;
-  color:white;
+.copy-btn {
+  background: var(--brand);
+  color: #ffffff;
 }
 
-.copy-btn:hover{
-  background:#1e5fae;
+.copy-btn:hover {
+  background: var(--brand-hover);
 }
 
-.ready-btn{
-  background:#3a7bd5;
-  color:white;
+.ready-btn {
+  background: var(--brand);
+  color: #ffffff;
 }
 
-.ready-btn:hover{
-  background:#2b63af;
+.ready-btn:hover {
+  background: var(--brand-hover);
 }
 
-.start-btn{
-  background:#4b8fe8;
-  color:white;
+.start-btn {
+  background: var(--brand);
+  color: #ffffff;
 }
 
-.start-btn:not(:disabled):hover{
-  background:#3576cc;
+.start-btn:not(:disabled):hover {
+  background: var(--brand-hover);
 }
 
 /* ================= INVITE ================= */
 
-.lobby input{
-  width:350px;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid rgba(60,81,150,0.699);
-  background:#184168;
-  color:white;
+.lobby input {
+  width: 350px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-input);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  transition: border-color 0.3s, background 0.3s, color 0.3s;
+}
+
+.lobby input:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
 }
 
 /* ================= COUNTDOWN ================= */
 
-.countdown{
-  font-size:70px;
-  font-weight:bold;
-  color:#bfce3d;
+.countdown {
+  font-size: 70px;
+  font-weight: bold;
+  color: var(--brand);
 }
 
 /* ================= TIMER ================= */
 
-.timer{
-  font-size:35px;
-  font-weight:600;
-  color:#bfce3d;
+.timer {
+  font-size: 35px;
+  font-weight: 600;
+  color: var(--timer);
 }
 
 /* ================= TEXT DISPLAY ================= */
 
-.text-display{
-  font-size:30px;
-  margin-bottom:20px;
-  padding:30px;
-  border-radius:25px;
-  border:2px solid rgba(57,88,190,0.164);
-  font-family:'JetBrains Mono', monospace;
-  font-weight:600;
-  line-height:1.6;
+.text-display {
+  font-size: 30px;
+  margin-bottom: 20px;
+  padding: 30px;
+  border-radius: 25px;
+  border: 2px solid var(--border-primary);
+  background: var(--bg-glass);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  line-height: 1.6;
+  transition: border-color 0.3s, background 0.3s;
 }
 
 /* ================= TYPING COLORS ================= */
 
-.char{
-  white-space:pre;
+.char {
+  white-space: pre;
 }
 
-.correct{
-  color:#4caf50;
+.correct {
+  color: var(--correct);
 }
 
-.active{
-  border-bottom:2px solid #dae480;
+.active {
+  border-bottom: 2px solid var(--active-char);
 }
 
-.wrong{
-  color:#f44336;
-  background-color:rgba(244,67,54,0.15);
-  border-radius:3px;
+.wrong {
+  color: var(--wrong);
+  background-color: var(--wrong-bg);
+  border-radius: 3px;
 }
 
 /* ================= INPUT ================= */
 
-.race-area input{
-  width:50%;
-  height:35px;
-  font-size:20px;
-  border-radius:10px;
-  border:1px solid rgba(60,81,150,0.699);
-  padding:5px 10px;
-  background:#184168;
-  color:white;
-  margin-top:25px;
+.race-area input {
+  width: 50%;
+  height: 35px;
+  font-size: 20px;
+  border-radius: 10px;
+  border: 1px solid var(--border-input);
+  padding: 5px 10px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  margin-top: 25px;
+  transition: border-color 0.3s, background 0.3s, color 0.3s;
+}
+
+.race-area input:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
 }
 
 /* ================= PROGRESS BARS ================= */
 
-.progress-bar{
-  width:400px;
-  height:20px;
-  background:#14295a;
-  margin:10px auto;
-  border-radius:10px;
-  overflow:hidden;
+.progress-bar {
+  width: 400px;
+  height: 20px;
+  background: var(--progress-bg);
+  margin: 10px auto;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.progress{
-  height:100%;
-  background:#4caf50;
+.progress {
+  height: 100%;
+  background: var(--progress-self);
 }
 
-.progress.opponent{
-  background:#ff5722;
+.progress.opponent {
+  background: var(--progress-opponent);
 }
 
 /* ================= RESULT ================= */
 
-.winner{
-  font-size:40px;
-  margin-top:20px;
-  color:gold;
+.winner {
+  font-size: 40px;
+  margin-top: 20px;
+  color: var(--brand);
 }
 
 .result {
   text-align: center;
   padding: 40px;
-  margin-left: 450px;
-  margin-top: 80px;
+  margin: 80px auto 0;
   border-radius: 20px;
-  background: linear-gradient(#758edf, #386dbd, #0b31b1);
-  width: 900px;
+  background: var(--result-gradient);
+  border: 1px solid var(--border-primary);
+  width: min(900px, 90vw);
+  box-shadow: var(--shadow-lg);
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .result h2 {
   margin-bottom: 20px;
+  color: var(--brand);
 }
 
 .result p {
   font-size: 20px;
   margin: 15px 0;
+  color: var(--text-primary);
 }
 
 .result button {
@@ -242,13 +274,13 @@ button:disabled{
   font-size: 18px;
   border-radius: 12px;
   border: none;
-  background: #3d7cce;
-  color: white;
+  background: var(--brand);
+  color: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .result button:hover {
-  background: #2b63af;
+  background: var(--brand-hover);
   transform: scale(1.05);
 }

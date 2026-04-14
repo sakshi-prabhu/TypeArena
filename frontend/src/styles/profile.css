@@ -4,7 +4,14 @@
   place-items: center;
   padding: 24px;
 
-  background: radial-gradient(circle at 15% 20%, #123278 0%, #090f43 45%, #020220 100%);
+  background: radial-gradient(
+    circle at 15% 20%,
+    var(--bg-page-gradient-1) 0%,
+    var(--bg-page-gradient-2) 45%,
+    var(--bg-page-gradient-3) 100%
+  );
+
+  transition: background 0.3s;
 }
 
 .profile-card {
@@ -12,22 +19,23 @@
   padding: 36px;
   border-radius: 18px;
 
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-primary);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
-  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow-lg);
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .profile-card h1 {
   margin: 0;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .subtitle {
   margin: 10px 0 26px;
-  color: rgba(255, 255, 255, 0.74);
+  color: var(--text-secondary);
 }
 
 .profile-grid {
@@ -39,23 +47,25 @@
 .profile-item {
   padding: 14px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-primary);
+  background: var(--bg-surface);
 
   display: flex;
   flex-direction: column;
   gap: 6px;
+
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .label {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.68);
+  color: var(--text-secondary);
 }
 
 .value {
   font-size: 20px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .editable-value-row {
@@ -75,14 +85,15 @@
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  background: rgba(0, 0, 0, 0.36);
-  color: #ffffff;
+  border: 1px solid var(--border-input);
+  background: var(--bg-input);
+  color: var(--text-primary);
   font-size: 15px;
+  transition: border-color 0.3s, background 0.3s, color 0.3s;
 }
 
 .profile-input:focus {
-  outline: 2px solid rgba(58, 111, 216, 0.65);
+  outline: 2px solid var(--brand);
   outline-offset: 1px;
 }
 
@@ -105,23 +116,26 @@
   padding: 8px 10px;
   border: none;
   border-radius: 8px;
-  background: #3a6fd8;
+  background: var(--brand);
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .mini-btn:hover {
-  background: #2e5cbf;
+  background: var(--brand-hover);
 }
 
 .mini-btn-secondary {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
 }
 
 .mini-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--bg-glass-hover);
 }
 
 .back-btn {
@@ -130,7 +144,7 @@
   border: none;
   border-radius: 10px;
 
-  background: #3a6fd8;
+  background: var(--brand);
   color: #ffffff;
   font-size: 15px;
   font-weight: 600;
@@ -140,7 +154,7 @@
 }
 
 .back-btn:hover {
-  background: #2e5cbf;
+  background: var(--brand-hover);
   transform: translateY(-1px);
 }
 

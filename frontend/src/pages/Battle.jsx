@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
 import "../styles/battle.css";
 import { socket } from "../socket/socket";
+import ThemeToggle from "../components/ThemeToggle";
 
 function Battle() {
   const hasCountedBattleRef = useRef(false);
@@ -248,6 +249,7 @@ function Battle() {
 
   return (
     <div className={`battle-container ${roomId && !battleStarted ? "lobby-view" : ""}`}>
+      <ThemeToggle />
 
       <h1>TypeArena Battle</h1>
 

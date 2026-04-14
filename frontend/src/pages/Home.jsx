@@ -1,11 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import "../styles/style.css";
+import ThemeToggle from "../components/ThemeToggle";
 
 function Home() {
   const navigate = useNavigate();
 
   return (
     <>
+      <ThemeToggle />
+
       {/* Profile Button */}
       <button
         className="profile-btn"

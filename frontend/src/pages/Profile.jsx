@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/profile.css";
+import ThemeToggle from "../components/ThemeToggle";
 
 const defaultProfile = {
   playerName: "Guest",
@@ -91,6 +92,7 @@ export default function Profile() {
 
   return (
     <div className="profile-page">
+      <ThemeToggle />
       <div className="profile-card">
         <h1>Player Profile</h1>
         <p className="subtitle">Track your progress and jump back into the arena.</p>
