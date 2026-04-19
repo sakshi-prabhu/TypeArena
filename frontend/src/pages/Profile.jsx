@@ -1,88 +1,90 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
 import "../styles/profile.css";
 import ThemeToggle from "../components/ThemeToggle";
+import { auth } from "../firebase";
+import { subscribeToUserProfile, updateUserProfile } from "../auth/authService";
 
 const defaultProfile = {
-  playerName: "Guest",
+  username: "Guest",
+  wpm: 0,
   battlesPlayed: 0,
-  age: "",
-  gender: "Prefer not to say",
+  streak: 0,
+  socialLinks: {},
 };
 
-function getBattlesPlayedCount() {
-  const rawCount = Number(localStorage.getItem("typearena.battlesPlayed") || "0");
-  return Number.isFinite(rawCount) && rawCount >= 0 ? Math.floor(rawCount) : 0;
+function normalizeProfile(profileData, user) {
+  return {
+    username:
+      profileData?.username || user?.displayName || user?.email?.split("@")[0] || "User",
+    wpm: Number(profileData?.wpm || 0),
+    battlesPlayed: Number(profileData?.battlesPlayed || 0),
+    streak: Number(profileData?.streak || 0),
+    socialLinks: profileData?.socialLinks || {},
+  };
 }
 
 export default function Profile() {
   const navigate = useNavigate();
+
+  const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(defaultProfile);
   const [draftProfile, setDraftProfile] = useState(defaultProfile);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    const savedProfile = localStorage.getItem("typearena.profile");
-    const battlesPlayed = getBattlesPlayedCount();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
 
-    if (savedProfile) {
-      try {
-        const parsed = JSON.parse(savedProfile);
-        const nextProfile = {
-          ...defaultProfile,
-          ...parsed,
-          battlesPlayed,
-        };
-
-        setProfile(nextProfile);
-        setDraftProfile(nextProfile);
-      } catch {
-        const fallbackProfile = {
-          ...defaultProfile,
-          battlesPlayed,
-        };
-        setProfile(fallbackProfile);
-        setDraftProfile(fallbackProfile);
-      }
-    } else {
-      const initialProfile = {
-        ...defaultProfile,
-        battlesPlayed,
-      };
-      setProfile(initialProfile);
-      setDraftProfile(initialProfile);
-    }
-
-    const onStorage = (event) => {
-      if (event.key === "typearena.battlesPlayed") {
-        const nextBattlesPlayed = getBattlesPlayedCount();
-        setProfile((prev) => ({ ...prev, battlesPlayed: nextBattlesPlayed }));
-        setDraftProfile((prev) => ({ ...prev, battlesPlayed: nextBattlesPlayed }));
-      }
-    };
-
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    return () => unsubscribe();
   }, []);
 
-  const saveProfile = () => {
-    const parsedAge = Number(draftProfile.age);
-    const battlesPlayed = getBattlesPlayedCount();
+  useEffect(() => {
+    if (!user) {
+      return undefined;
+    }
 
-    const nextProfile = {
-      playerName: draftProfile.playerName.trim() || "Guest",
-      battlesPlayed,
-      age:
-        Number.isFinite(parsedAge) && parsedAge >= 1 && parsedAge <= 120
-          ? String(Math.floor(parsedAge))
-          : "",
-      gender: draftProfile.gender || "Prefer not to say",
-    };
+    const unsubscribe = subscribeToUserProfile(user.uid, (profileData) => {
+      const nextProfile = normalizeProfile(profileData, user);
+      setProfile(nextProfile);
 
-    setProfile(nextProfile);
-    setDraftProfile(nextProfile);
+      setDraftProfile((currentDraft) => {
+        if (isEditing) {
+          return currentDraft;
+        }
+
+        return nextProfile;
+      });
+    });
+
+    return () => unsubscribe();
+  }, [user, isEditing]);
+
+  const displayProfile = user ? profile : defaultProfile;
+  const displayDraftProfile = user ? draftProfile : defaultProfile;
+
+  const saveProfile = async () => {
+    if (!user) return;
+
+    const nextUsername = draftProfile.username.trim() || "User";
+
+    await updateUserProfile(user.uid, {
+      username: nextUsername,
+    });
+
+    setProfile((currentProfile) => ({
+      ...currentProfile,
+      username: nextUsername,
+    }));
+
+    setDraftProfile((currentDraft) => ({
+      ...currentDraft,
+      username: nextUsername,
+    }));
+
     setIsEditing(false);
-    localStorage.setItem("typearena.profile", JSON.stringify(nextProfile));
   };
 
   const cancelEdit = () => {
@@ -99,73 +101,41 @@ export default function Profile() {
 
         <div className="profile-grid">
           <div className="profile-item">
-            <span className="label">Player Name</span>
+            <span className="label">Username</span>
             {isEditing ? (
               <input
                 type="text"
-                value={draftProfile.playerName}
+                value={displayDraftProfile.username}
                 onChange={(e) =>
                   setDraftProfile((prev) => ({
                     ...prev,
-                    playerName: e.target.value,
+                    username: e.target.value,
                   }))
                 }
                 className="profile-input"
                 maxLength={24}
               />
             ) : (
-              <span className="value">{profile.playerName}</span>
+              <span className="value">{displayProfile.username}</span>
             )}
+          </div>
+
+          <div className="profile-item">
+            <span className="label">WPM</span>
+            <span className="value">{displayProfile.wpm}</span>
+            <span className="label">Updated from Practice mode</span>
           </div>
 
           <div className="profile-item">
             <span className="label">Battles Played</span>
-            <span className="value">{profile.battlesPlayed}</span>
-            <span className="label">Auto-updated after each battle</span>
+            <span className="value">{displayProfile.battlesPlayed}</span>
+            <span className="label">Updated from Battle mode</span>
           </div>
 
           <div className="profile-item">
-            <span className="label">Age</span>
-            {isEditing ? (
-              <input
-                type="number"
-                min="1"
-                max="120"
-                value={draftProfile.age}
-                onChange={(e) =>
-                  setDraftProfile((prev) => ({
-                    ...prev,
-                    age: e.target.value,
-                  }))
-                }
-                className="profile-input"
-              />
-            ) : (
-              <span className="value">{profile.age || "-"}</span>
-            )}
-          </div>
-
-          <div className="profile-item">
-            <span className="label">Gender</span>
-            {isEditing ? (
-              <select
-                value={draftProfile.gender}
-                onChange={(e) =>
-                  setDraftProfile((prev) => ({
-                    ...prev,
-                    gender: e.target.value,
-                  }))
-                }
-                className="profile-input profile-select"
-              >
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-                <option value="Prefer not to say">Prefer not to say</option>
-              </select>
-            ) : (
-              <span className="value">{profile.gender}</span>
-            )}
+            <span className="label">Streak</span>
+            <span className="value">{displayProfile.streak || "-"}</span>
+            
           </div>
         </div>
 
@@ -174,7 +144,7 @@ export default function Profile() {
             <button
               type="button"
               className="mini-btn"
-              onClick={() => setIsEditing(true)}
+              onClick={() => user && setIsEditing(true)}
             >
               Edit Profile
             </button>

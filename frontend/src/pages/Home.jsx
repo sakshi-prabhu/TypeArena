@@ -1,9 +1,10 @@
-import { useNavigate } from "react-router-dom";
 import "../styles/style.css";
 import ThemeToggle from "../components/ThemeToggle";
 
-function Home() {
-  const navigate = useNavigate();
+function Home({ onProtectedNavigate }) {
+  const handleProtectedNavigation = (path) => {
+    onProtectedNavigate(path);
+  };
 
   return (
     <>
@@ -14,7 +15,7 @@ function Home() {
         className="profile-btn"
         type="button"
         aria-label="Open profile"
-        onClick={() => navigate("/profile")}
+        onClick={() => handleProtectedNavigation("/profile")}
       >
         <span className="material-symbols-outlined">person</span>
       </button>
@@ -26,11 +27,19 @@ function Home() {
           <p>Your ultimate typing challenge platform!</p>
 
           <div className="actions">
-            <button onClick={() => navigate("/practice")} id="practice-btn">
+          
+            <button
+              onClick={() => handleProtectedNavigation("/practice")}
+              id="practice-btn"
+            >
               Practice
             </button>
 
-            <button onClick={() => navigate("/battle")} id="battle-btn">
+        
+            <button
+              onClick={() => handleProtectedNavigation("/battle")}
+              id="battle-btn"
+            >
               Battle
             </button>
           </div>

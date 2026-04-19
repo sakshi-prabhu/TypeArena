@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from "react";
+import { onAuthStateChanged } from "firebase/auth";
 import "../styles/practice.css";
 import ThemeToggle from "../components/ThemeToggle";
+import { auth } from "../firebase";
+import { recordPracticeResult } from "../auth/authService";
 
 const wordList = [
   "time",
@@ -42,6 +45,7 @@ export default function Practice() {
   const [time, setTime] = useState(60);
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
+  const [user, setUser] = useState(null);
 
   const [correct, setCorrect] = useState(0);
   const [mistakes, setMistakes] = useState(0);
@@ -50,6 +54,15 @@ export default function Practice() {
   const spansRef = useRef([]);
   const indexRef = useRef(0);
   const timerRef = useRef(null);
+  const resultSavedRef = useRef(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const startPractice = () => {
     const newText = generateText();
@@ -60,6 +73,7 @@ export default function Practice() {
 
     setCorrect(0);
     setMistakes(0);
+    resultSavedRef.current = false;
 
     indexRef.current = 0;
 
@@ -129,6 +143,15 @@ export default function Practice() {
 
   const accuracy =
     totalTyped === 0 ? 0 : Math.round((correct / totalTyped) * 100);
+
+  useEffect(() => {
+    if (!finished || !user || resultSavedRef.current) return;
+
+    resultSavedRef.current = true;
+    recordPracticeResult(user.uid, wpm).catch((error) => {
+      console.error("Unable to save practice result", error);
+    });
+  }, [finished, user, wpm]);
 
   return (
     <div className="practice-page">
