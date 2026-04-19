@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
 import "../styles/battle.css";
 import { socket } from "../socket/socket";
 import ThemeToggle from "../components/ThemeToggle";
+import { auth } from "../firebase";
+import { recordBattleResult } from "../auth/authService";
 
 function Battle() {
   const hasCountedBattleRef = useRef(false);
@@ -27,11 +30,20 @@ function Battle() {
   const [winner, setWinner] = useState(null);
   const [correctChars, setCorrectChars] = useState(0);
   const [totalCharsTyped, setTotalCharsTyped] = useState(0);
+  const [user, setUser] = useState(null);
 
   const [timeLeft, setTimeLeft] = useState(60);
   const [timerRunning, setTimerRunning] = useState(false);
 
   const { roomId: urlRoomId = "" } = useParams();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // ----------------------
   // COUNTDOWN
@@ -109,6 +121,15 @@ function Battle() {
     };
   }, [startCountdown, urlRoomId]);
 
+  useEffect(() => {
+    if (!winner || !user || hasCountedBattleRef.current) return;
+
+    hasCountedBattleRef.current = true;
+    recordBattleResult(user.uid, wpm).catch((error) => {
+      console.error("Unable to save battle result", error);
+    });
+  }, [winner, user, wpm]);
+
   // ----------------------
   // TIMER
   // ----------------------
@@ -145,6 +166,26 @@ function Battle() {
 
   function startBattle() {
     socket.emit("start", roomId);
+  }
+
+  function resetBattle() {
+    hasCountedBattleRef.current = false;
+
+    setBattleStarted(false);
+    setCountdown(null);
+    setInput("");
+    setSpans([]);
+    setCurrentIndex(0);
+    setStartTime(null);
+    setWpm(0);
+    setAccuracy(0);
+    setWinner(null);
+    setCorrectChars(0);
+    setTotalCharsTyped(0);
+    setTimeLeft(60);
+    setTimerRunning(false);
+    setMyProgress(0);
+    setOpponentProgress(0);
   }
 
   // ----------------------
@@ -328,7 +369,7 @@ function Battle() {
           <p>Accuracy: {accuracy}%</p>
           <p>Mistakes: {totalCharsTyped - correctChars}</p>
 
-          <button onClick={() => window.location.reload()}>Play Again</button>
+          <button onClick={resetBattle}>Play Again</button>
         </div>
       )}
 
