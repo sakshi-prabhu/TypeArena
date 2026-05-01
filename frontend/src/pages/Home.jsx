@@ -1,12 +1,11 @@
+
 import "../styles/style.css";
 import ThemeToggle from "../components/ThemeToggle";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { subscribeToUserProfile } from "../auth/authService";
-
 import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase";
 
 function calculateScore(wpm, accuracy) {
   return Number(wpm || 0) * (Number(accuracy || 0) / 100);
@@ -14,6 +13,7 @@ function calculateScore(wpm, accuracy) {
 
 function Home({ onProtectedNavigate }) {
   const [user, setUser] = useState(null);
+
   const [profile, setProfile] = useState({
     username: "",
     bestWpm: 0,
@@ -25,6 +25,7 @@ function Home({ onProtectedNavigate }) {
 
   const [leaderboard, setLeaderboard] = useState([]);
 
+  // 🔐 Get logged-in user
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -33,6 +34,7 @@ function Home({ onProtectedNavigate }) {
     return () => unsubscribe();
   }, []);
 
+  // 👤 Get current user profile
   useEffect(() => {
     if (!user) return;
 
@@ -53,60 +55,44 @@ function Home({ onProtectedNavigate }) {
     return () => unsubscribe();
   }, [user]);
 
+  // 🌍 GLOBAL LEADERBOARD
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, "users"),
       (snapshot) => {
-        const users = [];
-
-        snapshot.forEach((doc) => {
+        const users = snapshot.docs.map((doc) => {
           const data = doc.data();
+
           const bestWpm = Number(data.bestWpm || 0);
           const bestAccuracy = Number(data.bestAccuracy || 0);
 
-          users.push({
+          return {
             id: doc.id,
             username: data.username || "Player",
             bestWpm,
             bestAccuracy,
             score: calculateScore(bestWpm, bestAccuracy),
-          });
+          };
         });
 
-        const currentUserEntry = user
-          ? {
-              id: user.uid,
-              username:
-                profile.username || user.displayName || user.email?.split("@")[0] || "Player",
-              bestWpm: profile.bestWpm || 0,
-              bestAccuracy: profile.bestAccuracy || 0,
-              score: profile.score || 0,
-            }
-          : null;
+        // 🔥 Sort by score
+        users.sort((a, b) => b.score - a.score);
 
-        const mergedUsers = currentUserEntry
-          ? [
-              ...users.filter((entry) => entry.id !== currentUserEntry.id),
-              currentUserEntry,
-            ]
-          : users;
+        // 🏆 Assign rank
+        const rankedUsers = users.map((user, index) => ({
+          ...user,
+          rank: index + 1,
+        }));
 
-        mergedUsers.sort((a, b) => (b.score || 0) - (a.score || 0));
-
-        setLeaderboard(
-          mergedUsers.map((entry, index) => ({
-            ...entry,
-            rank: index + 1,
-          }))
-        );
+        setLeaderboard(rankedUsers);
       },
       (error) => {
-        console.error("Error fetching leaderboard:", error);
+        console.error("Leaderboard error:", error);
       }
     );
 
     return () => unsubscribe();
-  }, [user, profile.username, profile.bestWpm, profile.bestAccuracy, profile.score]);
+  }, []);
 
   const handleProtectedNavigation = (path) => {
     onProtectedNavigate(path);
@@ -147,7 +133,7 @@ function Home({ onProtectedNavigate }) {
           </div>
         </div>
 
-  
+        {/* 🏆 Leaderboard */}
         <div className="leaderboard leaderboard-floating">
           <h2>Leaderboard</h2>
 
@@ -162,7 +148,7 @@ function Home({ onProtectedNavigate }) {
             {leaderboard.length === 0 ? (
               <div className="leaderboard-empty">No players yet</div>
             ) : (
-              leaderboard.slice(0, 10).map((user) => (
+              leaderboard.slice(0, 25).map((user) => (
                 <div key={user.id} className="leaderboard-row leaderboard-grid">
                   <span>{user.username}</span>
                   <span>{user.bestWpm}</span>
@@ -174,6 +160,7 @@ function Home({ onProtectedNavigate }) {
           </div>
         </div>
 
+        {/* 📊 Status */}
         <div className="leaderboard status-board status-floating">
           <div className="status-list">
             <div className="status-item">
@@ -191,3 +178,4 @@ function Home({ onProtectedNavigate }) {
 }
 
 export default Home;
+
