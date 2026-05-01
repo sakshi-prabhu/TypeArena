@@ -279,7 +279,17 @@ body {
 .leaderboard-row span {
   padding-right: 8px;
 }
+.leaderboard-body {
+  max-height: 200px;
+  overflow-y: scroll;
 
+  scrollbar-width: none;        
+  -ms-overflow-style: none;     
+}
+
+.leaderboard-body::-webkit-scrollbar {
+  display: none;                
+}
 .leaderboard-row span:not(:last-child) {
   border-right: 1px solid var(--border-primary);
 }
