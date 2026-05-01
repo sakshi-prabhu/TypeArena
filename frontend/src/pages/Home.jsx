@@ -25,7 +25,7 @@ function Home({ onProtectedNavigate }) {
 
   const [leaderboard, setLeaderboard] = useState([]);
 
-  // 🔐 Get logged-in user
+ 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -34,7 +34,7 @@ function Home({ onProtectedNavigate }) {
     return () => unsubscribe();
   }, []);
 
-  // 👤 Get current user profile
+  
   useEffect(() => {
     if (!user) return;
 
@@ -55,7 +55,7 @@ function Home({ onProtectedNavigate }) {
     return () => unsubscribe();
   }, [user]);
 
-  // 🌍 GLOBAL LEADERBOARD
+
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, "users"),
@@ -75,10 +75,10 @@ function Home({ onProtectedNavigate }) {
           };
         });
 
-        // 🔥 Sort by score
+     
         users.sort((a, b) => b.score - a.score);
 
-        // 🏆 Assign rank
+      
         const rankedUsers = users.map((user, index) => ({
           ...user,
           rank: index + 1,
@@ -133,7 +133,7 @@ function Home({ onProtectedNavigate }) {
           </div>
         </div>
 
-        {/* 🏆 Leaderboard */}
+      
         <div className="leaderboard leaderboard-floating">
           <h2>Leaderboard</h2>
 
@@ -160,7 +160,7 @@ function Home({ onProtectedNavigate }) {
           </div>
         </div>
 
-        {/* 📊 Status */}
+       
         <div className="leaderboard status-board status-floating">
           <div className="status-list">
             <div className="status-item">
