@@ -148,7 +148,7 @@ function Home({ onProtectedNavigate }) {
             {leaderboard.length === 0 ? (
               <div className="leaderboard-empty">No players yet</div>
             ) : (
-              leaderboard.slice(0, 25).map((user) => (
+              leaderboard.slice(0, 250).map((user) => (
                 <div key={user.id} className="leaderboard-row leaderboard-grid">
                   <span>{user.username}</span>
                   <span>{user.bestWpm}</span>
