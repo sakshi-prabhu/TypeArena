@@ -1,10 +1,7 @@
-
 import "../styles/style.css";
 import ThemeToggle from "../components/ThemeToggle";
 import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { subscribeToUserProfile } from "../auth/authService";
+import { db } from "../firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 
 function calculateScore(wpm, accuracy) {
@@ -12,41 +9,13 @@ function calculateScore(wpm, accuracy) {
 }
 
 function Home({ onProtectedNavigate }) {
-  const [user, setUser] = useState(null);
-
-  const [profile, setProfile] = useState({
-    username: "",
-    bestWpm: 0,
-    bestAccuracy: 0,
-    score: 0,
-    streak: 0,
-    battlesPlayed: 0,
-  });
-
   const [leaderboard, setLeaderboard] = useState([]);
   const [showFullLeaderboard, setShowFullLeaderboard] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
   }, []);
-
-  useEffect(() => {
-    if (!user) return;
-    const unsubscribe = subscribeToUserProfile(user.uid, (profileData) => {
-      setProfile({
-        username: profileData?.username || user.displayName || "Player",
-        bestWpm: Number(profileData?.bestWpm || 0),
-        bestAccuracy: Number(profileData?.bestAccuracy || 0),
-        score: calculateScore(profileData?.bestWpm, profileData?.bestAccuracy),
-        streak: Number(profileData?.streak || 0),
-        battlesPlayed: Number(profileData?.battlesPlayed || 0),
-      });
-    });
-    return () => unsubscribe();
-  }, [user]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -93,8 +62,13 @@ function Home({ onProtectedNavigate }) {
         {/* ── Left column ── */}
         <div className="home-left">
           <div className="hero">
-            <h1 className="main-heading">Welcome to TypeArena</h1>
-            <p className="hero-sub">Type fast. Battle friends. Climb the ranks.</p>
+          
+            <h1 className="main-heading">
+              <span className="brand-type">Type</span><span className="brand-arena">Arena</span>
+            </h1>
+            <p className="hero-tagline">Your ultimate typing challenge platform!</p>
+            <p className="hero-sub">Type fast · Battle friends · Climb the ranks</p>
+
             <div className="actions">
               <button
                 onClick={() => onProtectedNavigate("/practice")}
@@ -109,24 +83,19 @@ function Home({ onProtectedNavigate }) {
                 Battle
               </button>
             </div>
-          </div>
 
-          <div className="stat-cards">
-            <div className="stat-card">
-              <span className="stat-icon">🔥</span>
-              <span className="stat-value">{user ? profile.streak : "—"}</span>
-              <span className="stat-label">Day Streak</span>
+            {/* 🔥 Added Why Us Points */}
+            <div className="why-us">
+              <p> Real-time battles with instant results</p>
+              <p> Track and improve your speed and accuracy</p>
+              <p> Compete globally and climb the leaderboard</p>
+              <p> Designed for focus, speed, and performance</p>
+              <p> Get instant feedback after every test</p>
+              <p> Challenge players from around the world</p>
+              <p> Monitor your progress over time</p>
+              <p> Push your limits with every session</p>
             </div>
-            <div className="stat-card">
-              <span className="stat-icon">⚔️</span>
-              <span className="stat-value">{user ? profile.battlesPlayed : "—"}</span>
-              <span className="stat-label">Battles</span>
-            </div>
-            <div className="stat-card">
-              <span className="stat-icon">⚡</span>
-              <span className="stat-value">{user ? profile.bestWpm : "—"}</span>
-              <span className="stat-label">Best WPM</span>
-            </div>
+
           </div>
         </div>
 
@@ -144,7 +113,6 @@ function Home({ onProtectedNavigate }) {
               <>
                 <div className="podium">
 
-                  {/* Silver — 2nd */}
                   {top3[1] ? (
                     <div className="podium-slot">
                       <div className="podium-info silver-info">
@@ -161,7 +129,6 @@ function Home({ onProtectedNavigate }) {
                     <div className="podium-slot podium-slot-empty" />
                   )}
 
-                  {/* Gold — 1st */}
                   {top3[0] && (
                     <div className="podium-slot">
                       <span className="podium-crown">👑</span>
@@ -177,7 +144,6 @@ function Home({ onProtectedNavigate }) {
                     </div>
                   )}
 
-                  {/* Bronze — 3rd */}
                   {top3[2] ? (
                     <div className="podium-slot">
                       <div className="podium-info bronze-info">
@@ -208,7 +174,6 @@ function Home({ onProtectedNavigate }) {
         </div>
       </div>
 
-      {/* Full Leaderboard Modal */}
       {showFullLeaderboard && (
         <div
           className="lb-overlay"
