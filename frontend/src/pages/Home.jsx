@@ -84,7 +84,7 @@ function Home({ onProtectedNavigate }) {
               </button>
             </div>
 
-            {/* 🔥 Added Why Us Points */}
+            {/*  Added Why Us Points */}
             <div className="why-us">
               <p> Real-time battles with instant results</p>
               <p> Track and improve your speed and accuracy</p>
