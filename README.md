@@ -1,117 +1,120 @@
 # TypeArena – Real-Time Typing Battle
 
-TypeArena is a real-time multiplayer typing game where players can compete with friends and test their typing speed and accuracy. Players can generate an invite link, join a lobby, and race against each other within a limited time.
+TypeArena is a real-time multiplayer typing game where players compete in live typing races. It focuses on speed, accuracy, and synchronized gameplay using WebSockets.
 
-The app also includes a Practice Mode where users can practice typing individually and improve their typing speed.
+The application supports both competitive multiplayer matches and individual practice, making it useful for improving typing performance as well as demonstrating real-time system design.
 
-This project uses Socket.IO for real-time communication with a React frontend and Node.js backend.
 
----
+
+## Live Demo
+
+https://typearena-game.vercel.app/
+
 
 ## Features
 
-* Real-time multiplayer typing race
-* Generate and share invite links
-* Lobby system before the game starts
-* 60-second typing challenge
-* Live typing progress updates
+* Real-time multiplayer typing races
+* Invite-based room system
+* Lobby with player readiness synchronization
+* 60-second timed typing challenge
+* Live progress updates for all players
+* Accuracy and WPM-based scoring
 * Practice mode for solo typing
-* Clean and responsive UI
+* Firebase-based authentication
 
----
+
+## How It Works
+
+### Multiplayer Mode
+
+1. A user creates a game room
+2. An invite link is generated and shared
+3. Players join the lobby
+4. Each player marks themselves as ready
+5. The server synchronizes all players and starts the countdown
+6. Players type the given text within 60 seconds
+7. Results are calculated based on speed and accuracy
+
+
+### Practice Mode
+
+* No lobby required
+* Instant start
+* Focus on improving typing speed and consistency
+
 
 ## Tech Stack
 
-**Frontend**
+### Frontend
 
 * React
 * React Router
 * CSS
 * Vite
 
-**Backend**
+### Backend
 
 * Node.js
 * Express.js
 * Socket.IO
 
-**Tools**
+### Services
+
+* Firebase (Authentication and user management)
+
+### Tools
 
 * Git
 * GitHub
 
----
 
 ## Project Structure
 
-```
 typing-battle/
-│
-├── frontend/              # React frontend
+
+├── frontend/
 │   ├── src/
 │   │   ├── pages/
 │   │   ├── components/
+│   │   ├── context/
+│   │   ├── engine/
+│   │   ├── socket/
+│   │   ├── auth/
 │   │   ├── styles/
-│   │   └── App.jsx
-│   │
+│   │   ├── assets/
+│   │   ├── firebase.js
+│   │   ├── App.jsx
+│   │   └── main.jsx
 │   └── package.json
-│
-├── backend/               # Node.js backend
+
+├── backend/
 │   ├── server.js
-│   ├── socket.js
-│   └── package.json
-│
+│   ├── socketHandler.js
+│   ├── package.json
+│   └── node_modules/
+
 └── README.md
-```
 
----
 
-## Running the Project
+## Architecture Overview
 
-### Start the backend server
+TypeArena follows a client-server architecture:
 
-```
-cd backend
-node server.js
-```
+* The frontend handles UI, user interaction, and typing logic
+* The backend manages game rooms, player synchronization, and real-time events
+* Communication is handled via Socket.IO for low-latency updates
+* Firebase is used for authentication and user data management
 
-### Start the frontend
 
-Open another terminal:
+## Future Improvements
 
-```
-cd frontend
-npm run dev
-```
+* Global leaderboard system
+* Match history tracking
+* Ranked matchmaking
+* Custom difficulty levels
 
-Then open your browser and go to:
-
-```
-http://localhost:5173
-```
-
----
-
-## Game Modes
-
-### Multiplayer Battle
-
-1. Generate an invite link.
-2. Share the link with friends.
-3. Players join the lobby.
-4. Players click Ready.
-5. The game starts with a 60-second timer.
-6. Players type the given text as fast as possible.
-7. The player with the highest typing speed wins.
-
-### Practice Mode
-
-Users can also practice typing individually without joining a lobby. This mode helps improve typing speed and accuracy.
-
----
 
 ## Author
 
 Sakshi Prabhu
 IT Student
-Interested in Web Development and Real-Time Applications.
