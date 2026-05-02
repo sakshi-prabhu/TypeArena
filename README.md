@@ -97,7 +97,6 @@ typing-battle/
 
 
 ## Architecture Overview
-
 TypeArena follows a client-server architecture:
 
 * The frontend handles UI, user interaction, and typing logic
